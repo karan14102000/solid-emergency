@@ -1,0 +1,217 @@
+@prefix cdm: <https://datarefuge.org/sord-cdm#> .
+@prefix schema: <https://schema.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <https://example.org/cdm#> .
+
+###############################
+# CDM - Core Classes
+###############################
+
+cdm:Victim a owl:Class ;
+    rdfs:label "Victim" ;
+    rdfs:comment "An individual who has experienced or reported a humanitarian or protection incident." ;
+    owl:equivalentClass schema:Person ;
+    owl:equivalentClass foaf:Person ;
+    owl:equivalentClass ex:Victim .
+
+cdm:Perpetrator a owl:Class ;
+    rdfs:label "Perpetrator" ;
+    rdfs:comment "An individual or group responsible for an incident." ;
+    owl:equivalentClass ex:Perpetrator .
+
+cdm:Incident a owl:Class ;
+    rdfs:label "Incident" ;
+    rdfs:comment "An event or situation that involves victims, perpetrators, and locations." ;
+    owl:equivalentClass ex:Incident .
+
+cdm:Organisation a owl:Class ;
+    rdfs:label "Organisation" ;
+    rdfs:comment "An organization that reports, investigates, or assists victims." ;
+    owl:equivalentClass schema:Organization ;
+    owl:equivalentClass ex:Organisation .
+
+cdm:Report a owl:Class ;
+    rdfs:label "Report" ;
+    rdfs:comment "A report created to record an incident, linked to organizations and victims." ;
+    owl:equivalentClass ex:Report .
+
+###############################
+# CDM - Core Properties
+###############################
+
+cdm:fullName a owl:DatatypeProperty ;
+    rdfs:label "Full name" ;
+    rdfs:comment "The full name of the person or victim." ;
+    owl:equivalentProperty schema:name ;
+    owl:equivalentProperty foaf:name ;
+    owl:equivalentProperty ex:fullName .
+
+cdm:age a owl:DatatypeProperty ;
+    rdfs:label "Age" ;
+    owl:equivalentProperty schema:age ;
+    owl:equivalentProperty ex:age .
+
+cdm:gender a owl:DatatypeProperty ;
+    rdfs:label "Gender" ;
+    owl:equivalentProperty schema:gender ;
+    owl:equivalentProperty ex:gender .
+
+cdm:location a owl:DatatypeProperty ;
+    rdfs:label "Location" ;
+    rdfs:comment "Place of incident or residence." ;
+    owl:equivalentProperty schema:address ;
+    owl:equivalentProperty schema:location ;
+    owl:equivalentProperty foaf:based_near ;
+    owl:equivalentProperty ex:location .
+
+cdm:country a owl:DatatypeProperty ;
+    rdfs:label "Country" ;
+    owl:equivalentProperty schema:addressCountry ;
+    owl:equivalentProperty ex:country .
+
+cdm:status a owl:DatatypeProperty ;
+    rdfs:label "Status" ;
+    rdfs:comment "The current status of the victim (e.g., missing, kidnapped, safe)." ;
+    owl:equivalentProperty schema:description ;
+    owl:equivalentProperty ex:status .
+
+cdm:incidentID a owl:DatatypeProperty ;
+    rdfs:label "Incident ID" ;
+    owl:equivalentProperty ex:incidentID .
+
+cdm:incidentType a owl:DatatypeProperty ;
+    rdfs:label "Incident Type" ;
+    owl:equivalentProperty ex:incidentType .
+
+cdm:date a owl:DatatypeProperty ;
+    rdfs:label "Date" ;
+    owl:equivalentProperty schema:date ;
+    owl:equivalentProperty dct:created ;
+    owl:equivalentProperty ex:date .
+
+cdm:isVictimOf a owl:ObjectProperty ;
+    rdfs:label "is Victim Of" ;
+    rdfs:comment "Links a victim to the incident they are a victim of." ;
+    owl:equivalentProperty ex:isVictimOf .
+
+cdm:isPerpetratorOf a owl:ObjectProperty ;
+    rdfs:label "is Perpetrator Of" ;
+    rdfs:comment "Links a perpetrator to the incident they are responsible for." ;
+    owl:equivalentProperty ex:isPerpetratorOf .
+
+cdm:reportedBy a owl:ObjectProperty ;
+    rdfs:label "Reported By" ;
+    owl:equivalentProperty schema:creator ;
+    owl:equivalentProperty ex:reportedBy .
+
+###############################
+# Metadata properties
+###############################
+
+cdm:sensitive a owl:AnnotationProperty ;
+    rdfs:label "Sensitive field indicator" ;
+    rdfs:comment "Marks if a property is sensitive and should be hidden unless explicit access is given." .
+
+cdm:disclosureLevel a owl:DatatypeProperty ;
+    rdfs:label "Disclosure Level" ;
+    rdfs:comment "Defines access level: minimal, restricted, or open." .
+
+cdm:createdBy a owl:ObjectProperty ;
+    rdfs:label "Created By" ;
+    rdfs:comment "Links the dataset or report to the organization or user who created it." ;
+    owl:equivalentProperty dct:creator ;
+    owl:equivalentProperty schema:creator .
+
+###############################
+# Example Individuals (for testing)
+###############################
+
+<#victimExample> a cdm:Victim ;
+    cdm:fullName "Michael" ;
+    cdm:location "Spain" ;
+    cdm:status "Kidnapped" ;
+    cdm:country "Spain" ;
+    cdm:isVictimOf <#incidentExample> .
+
+<#incidentExample> a cdm:Incident ;
+    cdm:incidentID "73293" ;
+    cdm:incidentType "abduction" ;
+    cdm:date "2025-11-02T12:34:00Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+    cdm:location "Madrid" .
+
+cdm:Article a owl:Class ;
+    rdfs:label "Article" ;
+    owl:equivalentClass ex:Article .
+
+cdm:SituationReport a owl:Class ;
+    rdfs:label "Situation Report" ;
+    owl:equivalentClass ex:SituationReport .
+
+cdm:state a owl:DatatypeProperty ;
+    rdfs:label "State or Region" .
+
+cdm:town a owl:DatatypeProperty ;
+    rdfs:label "Town or City" .
+
+cdm:village a owl:DatatypeProperty ;
+    rdfs:label "Village" .
+
+cdm:gps a owl:DatatypeProperty ;
+    rdfs:label "GPS Coordinates" .
+
+cdm:description a owl:DatatypeProperty ;
+    rdfs:label "Description" .
+
+cdm:medicalImpact a owl:DatatypeProperty ;
+    rdfs:label "Medical Impact" .
+
+cdm:mentalhealthImpact a owl:DatatypeProperty ;
+    rdfs:label "Mental Health Impact" .
+
+cdm:socialImpact a owl:DatatypeProperty ;
+    rdfs:label "Social Impact" .
+
+cdm:violencePerpetrated a owl:DatatypeProperty ;
+    rdfs:label "Violence Perpetrated" .
+
+cdm:reference a owl:DatatypeProperty ;
+    rdfs:label "Reference" .
+
+cdm:source a owl:DatatypeProperty ;
+    rdfs:label "Source" .
+
+cdm:timeRange a owl:DatatypeProperty ;
+    rdfs:label "Time Range" .
+
+cdm:victimID a owl:DatatypeProperty ;
+    rdfs:label "Victim ID" .
+
+cdm:perpetratorID a owl:DatatypeProperty ;
+    rdfs:label "Perpetrator ID" .
+
+cdm:category a owl:DatatypeProperty ;
+    rdfs:label "Category" .
+
+cdm:maritalStatus a owl:DatatypeProperty ;
+    rdfs:label "Marital Status" .
+
+cdm:parentalStatus a owl:DatatypeProperty ;
+    rdfs:label "Parental Status" .
+
+cdm:affiliation a owl:DatatypeProperty ;
+    rdfs:label "Affiliation" .
+
+cdm:number a owl:DatatypeProperty ;
+    rdfs:label "Number" .
+
+cdm:organisationID a owl:DatatypeProperty ;
+    rdfs:label "Organisation ID" .
+
+cdm:inputBy a owl:DatatypeProperty ;
+    rdfs:label "Input By" .
+
+cdm:link a owl:DatatypeProperty ;
+    rdfs:label "Link" .

@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import { initSession, login, logout, isLoggedIn, getWebId } from "./auth";
-import { saveEmergencyData, loadEmergencyData } from "./solidData";
-import type { EmergencyData } from "./solidData";
+import {
+  saveEmergencyData,
+  loadEmergencyData,
+  saveNgoList,
+  loadNgoList,
+} from "./solidDatanew";
+import { loadOntology } from "./cdmnew";
+import type { EmergencyData } from "./solidDatanew";
 import { getSolidDataset, getThing, getUrlAll } from "@inrupt/solid-client";
 import { solidFetch } from "./auth";
 import { makeEmergencyPublic, makeEmergencyPrivate } from "./accessControl";
+import { grantAccessToSelectedNGOs } from "./accessControl";
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -56,9 +63,13 @@ export default function App() {
   const [rawRdf, setRawRdf] = useState("");
   const [loadedEntry, setLoadedEntry] = useState<EmergencyData | null>(null);
 
+  const [trustedNgos, setTrustedNgos] = useState<string[]>([]);
+  const [newNgo, setNewNgo] = useState("");
+  const [allNgos, setAllNgos] = useState<string[]>([]); // New state to hold all entered NGOs
+  // const [lastSelectedNgos, setLastSelectedNgos] = useState<string[]>([]);
   useEffect(() => {
     (async () => {
-      await initSession();
+      await Promise.all([initSession(), loadOntology()]);
       const ok = isLoggedIn();
       setLoggedIn(ok);
       const id = getWebId() ?? null;
@@ -190,10 +201,10 @@ export default function App() {
       setStatus("saving…");
       const url = await saveEmergencyData(podBaseUrl, toEmergencyData());
       setStatus(`saved: ${url}`);
-      const loaded = await loadEmergencyData(podBaseUrl);
-      if (loaded) {
-        setLoadedEntry(loaded);
-      }
+      // const loaded = await loadEmergencyData(podBaseUrl);
+      // if (loaded) {
+      //   setLoadedEntry(loaded);
+      // }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       setStatus(`error: ${msg}`);
@@ -253,6 +264,39 @@ export default function App() {
       setStatus(`error: ${msg}`);
     }
   }
+
+  const handleNgoSelection = (ngo: string) => {
+    if (trustedNgos.includes(ngo)) {
+      setTrustedNgos(trustedNgos.filter((item) => item !== ngo));
+    } else {
+      setTrustedNgos([...trustedNgos, ngo]);
+    }
+  };
+
+  const addNgoToList = () => {
+    if (newNgo && !allNgos.includes(newNgo)) {
+      // Add to allNgos if not a duplicate
+      setAllNgos([...allNgos, newNgo]);
+      setNewNgo("");
+    }
+  };
+
+  const selectAllNGOs = () => {
+    setTrustedNgos([...allNgos]); // Select all NGOs from the master list
+  };
+
+  const deselectAllNGOs = () => {
+    setTrustedNgos([]); // Deselect all NGOs by setting trustedNgos to an empty array
+  };
+
+  // const selectLastSelectedNGOs = () => {
+  //   setTrustedNgos([...lastSelectedNgos]);
+  // };
+
+  const allowAccessToSelectedNGOs = () => {
+    const selectedNGOs = trustedNgos.filter((ngo) => trustedNgos.includes(ngo));
+    grantAccessToSelectedNGOs(selectedNGOs, podBaseUrl); // Call the function from accessControl.ts
+  };
 
   if (!ready) return <div style={{ padding: 24 }}>Loading…</div>;
 
@@ -524,6 +568,36 @@ export default function App() {
             <button onClick={handleMakePublic}>Make Public</button>
             <button onClick={handleMakePrivate}>Make Private</button>
           </div>
+
+          <div>
+            <h3>Select Trusted NGOs</h3>
+            {allNgos.map((ngo, index) => (
+              <div key={index}>
+                <input
+                  type="checkbox"
+                  checked={trustedNgos.includes(ngo)}
+                  onChange={() => handleNgoSelection(ngo)}
+                />
+                {ngo}
+              </div>
+            ))}
+            <input
+              type="text"
+              value={newNgo}
+              onChange={(e) => setNewNgo(e.target.value)}
+              placeholder="Add new NGO"
+            />
+            <button onClick={addNgoToList}>Add NGO</button>
+            <button onClick={selectAllNGOs}>Select All</button>
+            <button onClick={deselectAllNGOs}>Deselect All</button>
+            {/*<button onClick={selectLastSelectedNGOs}>
+              Select Last Selected
+            </button>*/}
+          </div>
+
+          <button onClick={allowAccessToSelectedNGOs}>
+            Allow Access to Selected NGOs
+          </button>
 
           <div style={{ fontSize: 12, opacity: 0.8, marginTop: 6 }}>
             {status}
